@@ -1,0 +1,8 @@
+{
+    "motion_blur":false,
+    "sandp":false,
+    "brightness_shift":false,
+    "guassian_blur":true,
+    "guassian_noise":false,
+    "change_hue":false
+ }
