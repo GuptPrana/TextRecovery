@@ -1,0 +1,62 @@
+"""
+Implementation of gaussian filter algorithm
+"""
+from itertools import product
+from google.colab.patches import cv2_imshow
+from cv2 import COLOR_BGR2GRAY, cvtColor, imread, imshow, waitKey
+from numpy import dot, exp, mgrid, pi, ravel, square, uint8, zeros
+
+def gen_gaussian_kernel(k_size, sigma):
+    center = k_size // 2
+    x, y = mgrid[0 - center : k_size - center, 0 - center : k_size - center]
+    g = 1 / (2 * pi * sigma) * exp(-(square(x) + square(y)) / (2 * square(sigma))) # gaussian distribution
+    return g
+
+
+def gaussian_filter(image, k_size, sigma):
+    height, width = image.shape[0], image.shape[1]
+    # dst image height and width
+    dst_height = height - k_size + 1
+    dst_width = width - k_size + 1
+
+    # im2col, turn the k_size*k_size pixels into a row and np.vstack all rows
+    image_array = zeros((dst_height * dst_width, k_size * k_size))
+    row = 0
+    for i, j in product(range(dst_height), range(dst_width)):
+        window = ravel(image[i : i + k_size, j : j + k_size])
+        image_array[row, :] = window
+        row += 1
+
+    #  turn the kernel into shape(k*k, 1)
+    gaussian_kernel = gen_gaussian_kernel(k_size, sigma)
+    filter_array = ravel(gaussian_kernel)
+
+    # reshape and get the dst image
+    dst = dot(image_array, filter_array).reshape(dst_height, dst_width).astype(uint8)
+
+    return dst
+
+def add_gaussian_noise(image, sigma):
+	gauss = numpy.random.normal(0, sigma, numpy.shape(image))
+	noisy_img = image + gauss
+	noisy_img[noisy_img < 0] = 0
+	noisy_img[noisy_img > 255] = 255
+	return noisy_img    
+
+
+if __name__ == "__main__":
+    # read original image
+    img = imread("D85_5810.jpg")
+    # turn image in gray scale value
+    noise = cvtColor(img, COLOR_BGR2GRAY)
+    gray = add_gaussian_noise(noise, 20)
+
+    # get values with two different mask size
+    gaussian3x3 = gaussian_filter(gray, 3, sigma=1)
+    gaussian5x5 = gaussian_filter(gray, 5, sigma=0.8)
+
+    # show result images
+    cv2_imshow(noise)
+    cv2_imshow(gaussian3x3)
+    cv2_imshow(gaussian5x5)
+    waitKey()
