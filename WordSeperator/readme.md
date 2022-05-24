@@ -1,0 +1,2 @@
+- import word_seperator
+- param - (image(numpy array) -> image that is denoised, centered, and croped| folder(string) -> relative path to an exisiting directory which will store the segmented image)
