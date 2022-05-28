@@ -1,10 +1,25 @@
-"""
-Implementation of gaussian filter algorithm
-"""
 from itertools import product
-from google.colab.patches import cv2_imshow
 from cv2 import COLOR_BGR2GRAY, cvtColor, imread, imshow, waitKey
+import cv2
 from numpy import dot, exp, mgrid, pi, ravel, square, uint8, zeros
+import numpy as np
+from scipy.signal import gaussian, convolve2d
+import random
+from ast import If
+from skimage.util import random_noise
+import matplotlib.pyplot as plt
+
+def apply_sandp(image, amount=0.1): # from Thanats part
+    return random_noise(image, mode='s&p', amount=amount)*255
+
+def guassian_blur(image,kernal ,sigma): # from Thanats part
+    while True:
+        try:
+            img = cv2.GaussianBlur(image,(kernal,kernal),sigma,cv2.BORDER_DEFAULT)
+            break
+        except:
+            kernal += 1
+    return img
 
 def gen_gaussian_kernel(k_size, sigma):
     center = k_size // 2
@@ -14,7 +29,9 @@ def gen_gaussian_kernel(k_size, sigma):
 
 
 def gaussian_filter(image, k_size, sigma):
+  
     height, width = image.shape[0], image.shape[1]
+
     # dst image height and width
     dst_height = height - k_size + 1
     dst_width = width - k_size + 1
@@ -36,8 +53,8 @@ def gaussian_filter(image, k_size, sigma):
 
     return dst
 
-def add_gaussian_noise(image, sigma):
-	gauss = numpy.random.normal(0, sigma, numpy.shape(image))
+def guassian_noise(image, sigma):
+	gauss = np.random.normal(0, sigma, np.shape(image))
 	noisy_img = image + gauss
 	noisy_img[noisy_img < 0] = 0
 	noisy_img[noisy_img > 255] = 255
@@ -45,18 +62,82 @@ def add_gaussian_noise(image, sigma):
 
 
 if __name__ == "__main__":
-    # read original image
-    img = imread("D85_5810.jpg")
-    # turn image in gray scale value
-    noise = cvtColor(img, COLOR_BGR2GRAY)
-    gray = add_gaussian_noise(noise, 20)
+    # read original image # turn image in gray scale value
+    img = imread("D85.jpeg")
+    gray = cvtColor(img, COLOR_BGR2GRAY)
 
-    # get values with two different mask size
-    gaussian3x3 = gaussian_filter(gray, 3, sigma=1)
-    gaussian5x5 = gaussian_filter(gray, 5, sigma=0.8)
+    # Add Gaussian noise
+    gnoise_img = guassian_noise(gray,5)
+    gnoise_img1 = guassian_noise(gray,10)
+    gnoise_img2 = guassian_noise(gray,20)
 
-    # show result images
-    cv2_imshow(noise)
-    cv2_imshow(gaussian3x3)
-    cv2_imshow(gaussian5x5)
-    waitKey()
+    # Add salt and pepper noise
+    snp_img = apply_sandp(gray, amount=0.05)
+    snp_img1 = apply_sandp(gray, amount=0.1)
+    snp_img2 = apply_sandp(gray, amount=0.2)
+
+    #Apply Gaussian filter for gnoiseimg
+    filtered_gimg1 = gaussian_filter(gnoise_img, 3, sigma=0.8)
+    filtered_gimg2 = gaussian_filter(gnoise_img, 3, sigma=0.9)
+    filtered_gimg3 = gaussian_filter(gnoise_img, 3, sigma=1)
+    filtered_gimg4 = gaussian_filter(gnoise_img, 5, sigma=0.8)
+    filtered_gimg5 = gaussian_filter(gnoise_img, 5, sigma=0.9)
+    filtered_gimg6 = gaussian_filter(gnoise_img, 5, sigma=1)
+    filtered_gimg7 = gaussian_filter(gnoise_img, 7, sigma=0.8)
+    filtered_gimg8 = gaussian_filter(gnoise_img, 7, sigma=0.9)
+    filtered_gimg9 = gaussian_filter(gnoise_img, 7, sigma=1)
+
+# filter image gnoise2
+    filtered_gimg1a = gaussian_filter(gnoise_img1, 3, sigma=0.8)
+    filtered_gimg1b = gaussian_filter(gnoise_img1, 3, sigma=0.9)
+    filtered_gimg1c= gaussian_filter(gnoise_img1, 3, sigma=1)
+    filtered_gimg1d = gaussian_filter(gnoise_img1, 5, sigma=0.8)
+    filtered_gimg1e = gaussian_filter(gnoise_img1, 5, sigma=0.9)
+    filtered_gimg1f = gaussian_filter(gnoise_img1, 5, sigma=1)
+    filtered_gimg1g = gaussian_filter(gnoise_img1, 7, sigma=0.8)
+    filtered_gimg1h = gaussian_filter(gnoise_img1, 7, sigma=0.9)
+    filtered_gimg1i = gaussian_filter(gnoise_img1, 7, sigma=1)
+
+    # filter image gnoise2
+    filtered_gimg2a = gaussian_filter(gnoise_img2, 3, sigma=0.8)
+    filtered_gimg2b = gaussian_filter(gnoise_img2, 3, sigma=0.9)
+    filtered_gimg2c = gaussian_filter(gnoise_img2, 3, sigma=1)
+    filtered_gimg2d = gaussian_filter(gnoise_img2, 5, sigma=0.8)
+    filtered_gimg2e = gaussian_filter(gnoise_img2, 5, sigma=0.9)
+    filtered_gimg2f = gaussian_filter(gnoise_img2, 5, sigma=1)
+    filtered_gimg2g = gaussian_filter(gnoise_img2, 7, sigma=0.8)
+    filtered_gimg2h = gaussian_filter(gnoise_img2, 7, sigma=0.9)
+    filtered_gimg2i = gaussian_filter(gnoise_img2, 7, sigma=1)
+
+    # filter image gnoise2
+    
+    filtered_snpimg1 = gaussian_filter(snp_img1, 3, sigma=0.8)
+    filtered_snpimg2 = gaussian_filter(snp_img1, 3, sigma=0.9)
+    filtered_snpimg3 = gaussian_filter(snp_img1, 3, sigma=1)
+    filtered_snpimg4 = gaussian_filter(snp_img1, 5, sigma=0.8)
+    filtered_snpimg5 = gaussian_filter(snp_img1, 5, sigma=0.9)
+    filtered_snpimg6 = gaussian_filter(snp_img1, 5, sigma=1)
+    filtered_snpimg7 = gaussian_filter(snp_img1, 7, sigma=0.8)
+    filtered_snpimg8 = gaussian_filter(snp_img1, 7, sigma=0.9)
+    filtered_snpimg9 = gaussian_filter(snp_img1, 7, sigma=1)    
+
+
+ # Display results
+    fig = plt.figure(figsize = (120, 100))
+    display = [gnoise_img,  filtered_gimg1, filtered_gimg2, filtered_gimg3, filtered_gimg4,filtered_gimg5,filtered_gimg6,filtered_gimg7,filtered_gimg8,filtered_gimg9,
+               gnoise_img1, filtered_gimg1a, filtered_gimg1b, filtered_gimg1c, filtered_gimg1d, filtered_gimg1e, filtered_gimg1f, filtered_gimg1g, filtered_gimg1h, filtered_gimg1i,
+               gnoise_img2, filtered_gimg2a, filtered_gimg2b, filtered_gimg2c, filtered_gimg2d, filtered_gimg2e, filtered_gimg2f, filtered_gimg2g, filtered_gimg2h, filtered_gimg2i,
+               snp_img,  filtered_snpimg1, filtered_snpimg2, filtered_snpimg3, filtered_snpimg4, filtered_snpimg5, filtered_snpimg6, filtered_snpimg7, filtered_snpimg8, filtered_snpimg9] 
+
+               
+    title = ['Gaussiannoise Image',  '3 SD = 0.8', '3 SD = 0.9', '3 SD = 1','5 SD = 0.8', '5 SD = 0.9', '7 SD = 1''7 SD = 0.8', '7 SD = 0.9', '7 SD = 1',
+             'Gaussiannoise Image1',  '3 SD = 0.8', '3 SD = 0.9', '3 SD = 1','5 SD = 0.8', '5 SD = 0.9', '7 SD = 1''7 SD = 0.8', '7 SD = 0.9', '7 SD = 1',
+             'Gaussiannoise Image2',  '3 SD = 0.8', '3 SD = 0.9', '3 SD = 1','5 SD = 0.8', '5 SD = 0.9', '7 SD = 1''7 SD = 0.8', '7 SD = 0.9', '7 SD = 1',
+             'SNP noise Image',  '3 SD = 0.8', '3 SD = 0.9', '3 SD = 1','5 SD = 0.8', '5 SD = 0.9', '7 SD = 1''7 SD = 0.8', '7 SD = 0.9', '7 SD = 1']
+
+    for i in range(len(display)):
+        fig.add_subplot(10, 4, i+1)
+        plt.imshow(display[i], cmap = 'gray')
+        plt.title(title[i])
+    
+    plt.show()
