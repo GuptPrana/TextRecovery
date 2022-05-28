@@ -1,53 +1,118 @@
-import os
 import numpy as np
 import matplotlib.pyplot as plt
 import cv2
+import random
+from ast import If
+from skimage.util import random_noise
 
+
+def apply_sandp(image, amount=0.1): # from Thanats part
+    return random_noise(image, mode='s&p', amount=amount)*255
+
+def guassian_blur(image,kernal ,sigma): # from Thanats part
+    while True:
+        try:
+            img = cv2.GaussianBlur(image,(kernal,kernal),sigma,cv2.BORDER_DEFAULT)
+            break
+        except:
+            kernal += 1
+    return img
+
+def guassian_noise(img, sigma):
+	gauss = np.random.normal(0, sigma, np.shape(img))
+	noisy_img = img + gauss
+	noisy_img[noisy_img < 0] = 0
+	noisy_img[noisy_img > 255] = 255
+	return noisy_img    
+    
 def median_filter(data, kernel_size):
+    
     temp = []
-    indexer = kernel_size // 2
-    data_final = []
-    data_final = np.zeros((len(data),len(data[0])))
-    for i in range(len(data)):
+    index = kernel_size // 2
+    final = []
+    final = np.zeros((len(data),len(data[0]))) # filtered image array
+    for i in range(len(data)): # each row pixel
 
-       for j in range(len(data[0])):
+       for j in range(len(data[0])): #each column pixel
 
-            for z in range(kernel_size):
-                if i + z - indexer < 0 or i + z - indexer > len(data) - 1:
+            for z in range(kernel_size): # size of kernel neighbours and pixel
+                if i + z - index < 0 or i + z - index > len(data) - 1: # if pixel no is < 0 or > no of row
                     for c in range(kernel_size):
                         temp.append(0)
                 else:
-                    if j + z - indexer < 0 or j + indexer > len(data[0]) - 1:
+                    if j + z - index < 0 or j + index > len(data[0]) - 1: # if pixel no is <0 or > no of column
                         temp.append(0)
                     else:
                         for k in range(kernel_size):
-                            temp.append(data[i + z - indexer][j + k - indexer])
+                            temp.append(data[i + z - index][j + k - index]) # append the pixel in the kernel 
 
-            temp.sort()
-            data_final[i][j] = temp[len(temp) // 2]
+            temp.sort() # sort the temp array with the pixel values
+            final[i][j] = temp[len(temp) // 2] # new image pixel value is the median value which is obtained from the middle of temp array
             temp = []
-    return data_final
+    return final # return filtered image
 
 if __name__ == '__main__':
-    # Load image and convert it to gray scale
-    file_name = cv2.imread('D85_5833.jpg')
-    	
-    gray = cv2.cvtColor(file_name, cv2.COLOR_BGR2GRAY)
-
+    # Load the image and convert it to gray scale
+    image = cv2.imread('D85.jpeg')	
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     # Add Gaussian noise
-    #noisy_img = add_gaussian_noise(img, 30)
+    gnoise_img = guassian_noise(image,5)
+    gnoise_img1 = guassian_noise(image,10)
+    gnoise_img2 = guassian_noise(image,20)
 
-    # Apply Median Filter
-    removed_noise_3 = median_filter(gray, 5)
-    #removed_noise_5 = median_filter(img, 5)
+    # Add salt and pepper noise
+    snp_img = apply_sandp(image, amount=0.05)
+    snp_img1 = apply_sandp(image, amount=0.1)
+    snp_img2 = apply_sandp(image, amount=0.2)
+
+    # Apply Median Filter for gimg
+    filtered_gimg1 = median_filter(gnoise_img, 3)
+    filtered_gimg2 = median_filter(gnoise_img, 5)
+    filtered_gimg3 = median_filter(gnoise_img, 7)
+
+    # Apply Median Filter for gimg1
+    filtered_gimg1a = median_filter(gnoise_img1, 3)
+    filtered_gimg1b = median_filter(gnoise_img1, 5)
+    filtered_gimg1c = median_filter(gnoise_img1, 7)
+
+    # Apply Median Filter for gimg2
+    filtered_gimg2a = median_filter(gnoise_img2, 3)
+    filtered_gimg2b = median_filter(gnoise_img2, 5)
+    filtered_gimg2c = median_filter(gnoise_img2, 7)
+
+    # Apply Median filter for snp img
+    filtered_snpimg1 = median_filter(snp_img, 3)
+    filtered_snpimg2 = median_filter(snp_img, 5)
+    filtered_snpimg3 = median_filter(snp_img, 7)
+
+    # Apply Median filter for snp img
+    filtered_snpimg1a = median_filter(snp_img1, 3)
+    filtered_snpimg1b = median_filter(snp_img1, 5)
+    filtered_snpimg1c = median_filter(snp_img1, 7)
+
+    # Apply Median filter for snp img
+    filtered_snpimg2a = median_filter(snp_img2, 3)
+    filtered_snpimg2b = median_filter(snp_img2, 5)
+    filtered_snpimg2c = median_filter(snp_img2, 7)                
 
     # Display results
     fig = plt.figure(figsize = (120, 100))
-    display = [gray,  removed_noise_3]
-    title = ['Original Image',  '3x3 Median Filter']
+    display = [gnoise_img,  filtered_gimg1, filtered_gimg2, filtered_gimg3, 
+               gnoise_img1, filtered_gimg1a, filtered_gimg1b, filtered_gimg1c,
+               gnoise_img2,  filtered_gimg2a, filtered_gimg2b, filtered_gimg2c,
+               snp_img,  filtered_snpimg1, filtered_snpimg2, filtered_snpimg3, 
+               snp_img1,  filtered_snpimg1a, filtered_snpimg1b, filtered_snpimg1c, 
+               snp_img2,  filtered_snpimg2a, filtered_snpimg2b, filtered_snpimg2c]
+               
+    title = ['Gaussiannoise Image',  '3x3 Median Filter', '5X5', '7X7',
+             'Gaussiannoise Image1',  '3x3 Median Filter', '5X5', '7X7',
+             'Gaussiannoise Image2',  '3x3 Median Filter', '5X5', '7X7',
+             'SNPnoise Image',  '3x3 Median Filter', '5X5', '7X7',
+             'SNPnoise Image2',  '3x3 Median Filter', '5X5', '7X7',
+             'SNPnoise Image3',  '3x3 Median Filter', '5X5', '7X7']
 
     for i in range(len(display)):
-        fig.add_subplot(2, 2, i+1)
+        fig.add_subplot(6, 4, i+1)
         plt.imshow(display[i], cmap = 'gray')
         plt.title(title[i])
     
