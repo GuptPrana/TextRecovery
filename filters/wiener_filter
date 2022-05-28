@@ -1,9 +1,35 @@
-#import os
 import numpy as np
 from numpy.fft import fft2, ifft2
 from scipy.signal import gaussian, convolve2d
 import matplotlib.pyplot as plt
 import cv2
+import random
+from ast import If
+from skimage.util import random_noise
+
+def apply_sandp(image, amount=0.1): # from Thanats part
+    return random_noise(image, mode='s&p', amount=amount)*255
+
+def apply_motion_blur(image, size=15, angle=0):
+    k = np.zeros((size, size), dtype=np.float32)
+    k[(size-1) // 2, :] = np.ones(size, dtype=np.float32)
+    k = cv2.warpAffine(k, cv2.getRotationMatrix2D(
+        (size / 2 - 0.5, size / 2 - 0.5), angle, 1.0), (size, size))
+    k = k * (1.0 / np.sum(k))
+    return cv2.filter2D(image, -1, k)
+
+def blur(img, kernel_size = 3):
+	dummy = np.copy(img)
+	h = np.eye(kernel_size) / kernel_size
+	dummy = convolve2d(dummy, h, mode = 'valid')
+	return dummy		
+
+def guassian_noise(img, sigma):
+	gauss = np.random.normal(0, sigma, np.shape(img))
+	noisy_img = img + gauss
+	noisy_img[noisy_img < 0] = 0
+	noisy_img[noisy_img > 255] = 255
+	return noisy_img 
 
 
 def wiener_filter(img, kernel, K):
@@ -17,29 +43,46 @@ def wiener_filter(img, kernel, K):
 	return temp
 
 def gaussian_kernel(kernel_size = 3):
-	h = gaussian(kernel_size, kernel_size / 3).reshape(kernel_size, 1)
+	h = gaussian(kernel_size, kernel_size / 15).reshape(kernel_size, 1)
 	h = np.dot(h, h.transpose())
 	h /= np.sum(h)
 	return h
 
 
 if __name__ == '__main__':
-	# Load image and convert it to gray scale
-	file_name = cv2.imread('D85_5833.jpg') 
+# Load image and convert it to gray scale
+	file_name = cv2.imread('D85.jpeg') 
 	gray = cv2.cvtColor(file_name, cv2.COLOR_BGR2GRAY)
+ 
+  # Add Gaussian noise
+	gnoise_img = guassian_noise(gray,20)
+ 
+	#Add S&P noise
+	snp_img = apply_sandp(gray, amount=0.1)
+	
 
 	# Apply Wiener Filter
-	kernel = gaussian_kernel(5)
-	filtered_img = wiener_filter(gray, kernel, K = 20)
-
+	kernel = gaussian_kernel(15)
+	filtered_gimg = wiener_filter(gnoise_img, kernel, K = 10)
+	filtered_gimg2 = wiener_filter(gnoise_img, kernel, K = 100)
+	filtered_gimg3 = wiener_filter(gnoise_img, kernel, K = 1000)
+	filtered_gimg4 = wiener_filter(gnoise_img, kernel, K = 10000)
+ 
+	filtered_snpimg = wiener_filter(snp_img, kernel, K = 10)
+	filtered_snpimg2 = wiener_filter(snp_img, kernel, K = 100)
+	filtered_snpimg3 = wiener_filter(snp_img, kernel, K = 1000)
+	filtered_snpimg4 = wiener_filter(snp_img, kernel, K = 10000)
+ 
 	# Display results
-	display = [gray , filtered_img]
-	label = ['Original Image','Wiener Filter applied']
+	display = [gnoise_img , filtered_gimg, filtered_gimg2, filtered_gimg3, filtered_gimg4,
+	           snp_img, filtered_snpimg, filtered_snpimg2, filtered_snpimg3, filtered_snpimg4]
+	label = ['Gnoise Image','Wiener Filter K = 10', 'Wiener Filter K = 100', 'Wiener Filter K = 1000', 'Wiener Filter K = 10000',
+	         'SNP noise', 'Wiener Filter K = 10','Wiener Filter K = 100','Wiener Filter K = 1000','Wiener Filter K = 10000']
 
 	fig = plt.figure(figsize=(120, 100))
 
 	for i in range(len(display)):
-		fig.add_subplot(2, 2, i+1)
+		fig.add_subplot(2, 5, i+1)
 		plt.imshow(display[i], cmap = 'gray')
 		plt.title(label[i])
 
