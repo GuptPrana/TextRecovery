@@ -1,17 +1,7 @@
-ELEC4130: Course Project 
+# Text Recovery from Low-Quality Images of Printed Documents
+## ELEC4130 Machine Learning on Images Final Project
 
-Character Recognition
-
-Preprocessing: 
-Salt and Pepper Noise
-Motion Blurring
-Shadow
-Color scales
-
-Model ideas:
-
-CNN:
-
-LSTM:
-
-BERT: 
+Code written by:
+TextRecognition - Pranav
+WordSeperator, DatasetGeneration - Thanat
+filters - Dhruv
