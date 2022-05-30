@@ -2,7 +2,7 @@
 ## ELEC4130 Machine Learning on Images Final Project
 
 Code written by:
-* Binarization
+* Binarization - Tanay
 * WordSeperator, DatasetGeneration - Thanat
 * filters - Dhruv
 * TextRecognition - Pranav
