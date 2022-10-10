@@ -7,7 +7,7 @@ Key Tasks:
 * Text Recognition Algorithm
 
 ## Machine Learning on Images Final Course Project
-Contribution:
+Contribution (organized by folders):
 * Binarization - Tanay
 * WordSeperator, DatasetGeneration - Thanat
 * filters - Dhruv
