@@ -6,6 +6,11 @@ Key Tasks:
 * Binarization
 * Text Recognition Algorithm
 
+To Do: 
+* Clean up code
+* Spatial Filtering
+* DEPLOY
+
 ## Machine Learning on Images Final Course Project
 Contribution (organized by folders):
 * Binarization - Tanay
